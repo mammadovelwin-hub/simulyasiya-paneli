@@ -88,8 +88,6 @@ Promise.all(files.map(f => fetch(f).then(r => r.json())))
 document.querySelectorAll(".inputs input, .inputs select").forEach(inp => {
   inp.addEventListener("input", calc);
 });
-</script>
-	
 
 function calc() {
   if (!globalData.length) return;
@@ -104,60 +102,44 @@ function calc() {
   const groups = {};
 
   globalData.forEach(row => {
-    // JSON sahələri
     const premium = parseFloat(row.premium_price) || 0;
     const val = parseFloat(row.value) || 0;
     const person_type = parseFloat(row.person_type_coc) || 0;
     const isLegal = parseInt(row.is_legal) || 0;
     const bm = parseInt(row.final_bm) || 0;
 
-    // Əmsal təyini qaydaları:
-    // 1. driver_experience_coc
-let drv = person_type !== 1
-  ? (parseFloat(row.driver_experience_coc) || 1)
-  : (drvEdit === 0 || isNaN(drvEdit)
+    let drv = person_type !== 1
       ? (parseFloat(row.driver_experience_coc) || 1)
-      : drvEdit);
+      : (drvEdit === 0 || isNaN(drvEdit)
+          ? (parseFloat(row.driver_experience_coc) || 1)
+          : drvEdit);
 
-	
-
-    // 2. vehicle_age_coc
     let veh = parseFloat(row.vehicle_age_coc) || 1;
     veh = vehEdit && vehEdit !== 0 ? vehEdit : veh;
 
-    // 3. vehicle_zone_coc
     let zone = parseFloat(row.vehicle_zone_coc) || 1;
     zone = zoneEdit && zoneEdit !== 0 ? zoneEdit : zone;
 
-    // 4. attorney_coc
     let auth = parseFloat(row.attorney_coc) || 1;
-    //if (person_type !== 1) {
-      //auth = authEdit && authEdit !== 0 ? authEdit : auth;}
-	auth = authEdit && authEdit !== 0 ? authEdit : auth;
-	
-	
-    // 5. person_type_coc
+    auth = authEdit && authEdit !== 0 ? authEdit : auth;
+
     let personCoc = parseFloat(row.person_type_coc) || 1;
     if (personCoc === 1.4 && legalEdit && legalEdit !== 0) {
       personCoc = legalEdit;
     }
 
-    // 6. bm_class_co
     let bmCo = parseFloat(row.bm_class_co) || 1;
-    if (bmVal === "0") bmCo = 1; // BM-sizdirsə, 1 elə
+    if (bmVal === "0") bmCo = 1;
 
-    // Hesablama:
     let simPrice = val * drv * veh * zone * auth * personCoc * bmCo;
     if (simPrice > val * 3) simPrice = val * 3;
 
-    // Bonus-Malus üzrə qrupla
     if (!groups[bm]) groups[bm] = { count: 0, real: 0, sim: 0 };
     groups[bm].count++;
     groups[bm].real += premium;
     groups[bm].sim += simPrice;
   });
 
-  // Cədvəli doldur
   const tbody = document.querySelector("#simTable tbody");
   tbody.innerHTML = "";
 
@@ -189,8 +171,10 @@ let drv = person_type !== 1
   document.getElementById("totalDiff").textContent = totalDiff.toLocaleString(undefined,{maximumFractionDigits:0});
 }
 </script>
+
 </body>
 </html>
+
 
 
 
