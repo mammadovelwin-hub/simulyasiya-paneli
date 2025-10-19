@@ -73,15 +73,23 @@
 <script>
 let globalData = [];
 
-//fetch('data.json')
-fetch("fetch("https://drive.google.com/uc?export=download&id=108OCR6I_QMuYe10zvfs26aGJi1P4xm3H")
-  .then(r => r.json())
-  .then(json => {
-    globalData = json;
-    calc(); // ilk hesablama
+// 30 hissəni burda siyahıya salırıq
+const files = Array.from({length: 30}, (_, i) => `data_part${i+1}.json`);
+
+// bütün hissələri yükləyirik
+Promise.all(files.map(f => fetch(f).then(r => r.json())))
+  .then(parts => {
+    globalData = parts.flat(); // hamısını bir massivə birləşdir
+    calc(); // əvvəlki hesablayan funksiyan
   })
   .catch(err => console.error("Xəta baş verdi:", err));
 
+// input dəyişiklikləri
+document.querySelectorAll(".inputs input, .inputs select").forEach(inp => {
+  inp.addEventListener("input", calc);
+});
+</script>
+	
 document.querySelectorAll(".inputs input, .inputs select").forEach(inp => {
   inp.addEventListener("input", calc);
 });
@@ -186,3 +194,4 @@ let drv = person_type !== 1
 </script>
 </body>
 </html>
+
